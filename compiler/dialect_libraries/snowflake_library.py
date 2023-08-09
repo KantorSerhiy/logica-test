@@ -90,7 +90,8 @@ ParseStrTimestamp(date_string) = SqlExpr(
 From_Unixtime(string) = SqlExpr(
   "TO_TIMESTAMP_TZ({string})", {string:});
   
-JsonExtractAsString(json, path) = JsonExtractScalar(json, path);
+JsonExtractAsString(json, path) = SqlExpr(
+  "json_format(json_extract({json}, {path}))", {json:, path:});
 
 ArrayContains(arr, x) = SqlExpr(
   "ARRAY_CONTAINS({x}::variant, {arr})",
