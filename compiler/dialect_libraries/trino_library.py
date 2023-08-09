@@ -36,4 +36,7 @@ ArgMinK(a, l) = SqlExpr(
 Array(a) = SqlExpr(
   "ARRAY_AGG({value} order by {arg})",
   {arg: a.arg, value: a.value});
+  
+JsonArrayContains(json_value, value) =
+  SqlExpr("json_array_contains({json_value}, {value})", {json_value:, value:});
 """
