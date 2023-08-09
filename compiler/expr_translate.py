@@ -61,7 +61,8 @@ class QL(object):
                     'FROM UNNEST(%s) as x)'),
       'IsNull': '(%s IS NULL)',
       'Join': 'ARRAY_TO_STRING(%s)',
-      'JsonExtractScalar': 'JSON_EXTRACT_PATH_TEXT({0}, {1})',
+      # 'JsonExtractScalar': 'JSON_EXTRACT_PATH_TEXT({0}, {1})',
+      'JsonExtractScalar': '{0}:{1}',
       'Like': '({0} LIKE {1})',
       'Range': 'GENERATE_ARRAY(0, %s - 1)',
       'RangeOf': 'GENERATE_ARRAY(0, ARRAY_LENGTH(%s) - 1)',
@@ -443,6 +444,9 @@ class QL(object):
     if 'call' in expression:
       call = expression['call']
       arguments = self.ConvertRecord(call['record'])
+      if call['predicate_name'] == "JsonExtractScalar":
+          # delete dollar sign and quotes from argumet
+          arguments[1] = arguments[1].strip("'").replace("$.", '')
       if call['predicate_name'] in self.ANALYTIC_FUNCTIONS:
         return self.ConvertAnalytic(call)
       if call['predicate_name'] == 'SqlExpr':
