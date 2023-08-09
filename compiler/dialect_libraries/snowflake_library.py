@@ -32,8 +32,6 @@ Array(a) = SqlExpr(
 ArraySize(array) = SqlExpr(
   "ARRAY_SIZE({array})", {array:});
   
-ArrayContains(array) = SqlExpr(
-  "ARRAY_CONTAINS({array})", {array:});
   
 Array_min(array) = SqlExpr(
   "SELECT min(pushkin.value) FROM LATERAL FLATTEN(INPUT => {array}}) pushkin", 
@@ -93,4 +91,8 @@ From_Unixtime(string) = SqlExpr(
   "TO_TIMESTAMP_TZ ({string})", {string:});
   
 JsonExtractAsString(json, path) = JsonExtractScalar(json, path);
+
+ArrayContains(arr, x) = SqlExpr(
+  "ARRAY_CONTAINS({x}::variant, {arr})",
+  {arr:, x:});
 """
