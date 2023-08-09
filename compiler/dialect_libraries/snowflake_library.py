@@ -1,5 +1,6 @@
 library = """
 ->(left:, right:) = {arg: left, value: right};
+
 ArgMin(a) = SqlExpr(
   "ARRAY_AGG({arg}) WITHIN GROUP (order by {value})[1]",
   {arg: a.arg, value: a.value});
@@ -42,5 +43,9 @@ JsonArrayGet(arr, index) = SqlExpr(
   
 JsonFormat(json) = SqlExpr(
   "TO_JSON({json})", 
-  {json:});    
+  {json:});
+
+ParseStrTimestamp(date_string) = SqlExpr(
+  "TRY_TO_TIMESTAMP({date_string})",
+  {date_string:});      
 """
