@@ -100,4 +100,7 @@ ParseStrTimestamp(str_timpestamp) = SqlExpr(
 
 From_Unixtime(string) = SqlExpr(
   "FROM_ISO8601_TIMESTAMP_NANOS({string})", {string:});
+  
+JsonExtractAsString(json, path) = SqlExpr(
+  "json_format(json_extract({json}, {path}))", {json:, path:});
 """

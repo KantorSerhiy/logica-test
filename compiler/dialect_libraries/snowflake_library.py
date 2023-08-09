@@ -91,4 +91,6 @@ ParseStrTimestamp(date_string) = SqlExpr(
 
 From_Unixtime(string) = SqlExpr(
   "TO_TIMESTAMP_TZ ({string})", {string:});
+  
+JsonExtractAsString(json, path) = JsonExtractScalar(json, path);
 """
