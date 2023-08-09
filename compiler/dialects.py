@@ -243,7 +243,8 @@ class Trino(Dialect):
         'ToInt64': 'CAST(%s AS BIGINT)',
         'ToFloat64': 'CAST(%s AS DOUBLE)',
         'AnyValue': 'ARBITRARY(%s)',
-        'ArrayConcat': '{0} || {1}'
+        'ArrayConcat': '{0} || {1}',
+        'Count': 'APPROX_DISTINCT(%s)'
     }
 
   def InfixOperators(self):
@@ -315,4 +316,3 @@ DIALECTS = {
     'presto': Presto,
     'trino': Trino
 }
-

@@ -90,8 +90,6 @@ class QL(object):
       '!=': '%s != %s',
       '++': 'CONCAT(%s, %s)',
       'in': '%s IN UNNEST(%s)',
-      'is': '%s IS %s',
-      'is not': '%s IS NOT %s',
       '||': '%s OR %s',
       '&&': '%s AND %s',
       '%': 'MOD(%s, %s)'
@@ -247,7 +245,6 @@ class QL(object):
     if self.dialect.Name() in ["PostgreSQL", "Presto", "Trino", "SqLite"]:
       # TODO: Do this safely.
       return '\'%s\'' % (literal['the_string'].replace("'", "''"))
-
     return json.dumps(literal['the_string'], ensure_ascii=False)
 
   def ListLiteralInternals(self, literal):

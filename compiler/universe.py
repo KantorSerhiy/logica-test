@@ -1098,4 +1098,3 @@ def FieldValuesAsList(field_values):
       return None  # Error!
     field_values_list.append(field_values[i])
   return field_values_list
-
