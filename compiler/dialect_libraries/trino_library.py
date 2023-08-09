@@ -13,10 +13,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 library = """
 ->(left:, right:) = {arg: left, value: right};
-`=`(left:, right:) = right :- left == right;
 
 ArgMin(a) = SqlExpr("(ARRAY_AGG({arg} order by {value}))[1]",
                     {arg: a.arg, value: a.value});
@@ -37,12 +35,43 @@ Array(a) = SqlExpr(
   "ARRAY_AGG({value} order by {arg})",
   {arg: a.arg, value: a.value});
   
-JsonArrayContains(json_value, value) =
-  SqlExpr("json_array_contains({json_value}, {value})", {json_value:, value:});
+ArraySize(array) = SqlExpr(
+  "CARDINALITY({array})", {array:});
   
-ToJsonArray(col) = SqlExpr("CAST({col} AS ARRAY<JSON>)", {col:});
+ArrayJoin(array, delimiter) = SqlExpr(
+  "ARRAY_JOIN({array}, {delimiter})", {array:, delimiter:});
+  
+ElementAt(array, index) = SqlExpr(
+  "ELEMENT_AT({array}, {index})", {array:, index:});
+  
+RMatch(s, p) = SqlExpr(
+  "REGEXP_LIKE({s}, {p})",
+  {s: s, p: p});
+  
+RExtract(s, p, g) = SqlExpr(
+  "REGEXP_EXTRACT({s}, {p}, {g})",
+  {s: s, p: p, g: g});
+  
+JsonArrayContains(json_value, value) = SqlExpr(
+  "JSON_ARRAY_CONTAINS({json_value}, {value})", {json_value:, value:});
 
-ToJson(col) = SqlExpr("CAST({col} AS JSON)", {col:});
+ToJsonArray(col) = SqlExpr(
+  "CAST({col} AS ARRAY<JSON>)", {col:});
+  
+ToJson(col) = SqlExpr(
+  "CAST({col} AS JSON)", {col:});
+  
+JsonParse(string) = SqlExpr(
+  "JSON_PARSE({string})", {string:});
+  
+GetField(obj, field) =  SqlExpr(
+  "JSON_EXTRACT_SCALAR({obj}, {field})", {obj:, field:});
+  
+Now() = SqlExpr(
+  "Now()", {});
+  
+DaysDiff(start_date:, end_date:) = DateDiff("day", start_date, end_date);
 
-GetField(obj, field) =  (SqlExpr("JSON_EXTRACT_SCALAR({obj}, {field})", {obj:, field:}));
+From_Unixtime(string) = SqlExpr(
+  "FROM_ISO8601_TIMESTAMP_NANOS({string})", {string:});
 """
