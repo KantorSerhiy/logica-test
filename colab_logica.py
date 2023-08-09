@@ -159,6 +159,11 @@ def RunSQL(sql, engine, connection=None, is_final=False):
       ShowError("Error while executing SQL:\n%s" % e)
       raise e
     return None
+  elif engine == "snowflake":
+    if is_final:
+      return pandas.read_sql(sql, connection)
+    else:
+      return connection.execute(sql)
   else:
     raise Exception('Logica only supports BigQuery, PostgreSQL and SQLite '
                     'for now.')
@@ -188,7 +193,19 @@ class PostgresRunner(object):
   def  __call__(self, sql, engine, is_final):
     return RunSQL(sql, engine, self.connection, is_final)
 
+class SnowflakeRunner(object):
+  def __init__(self):
+    global DB_CONNECTION
+    global DB_ENGINE
+    if DB_CONNECTION:
+      self.engine = DB_ENGINE
+      self.connection = DB_CONNECTION
 
+      DB_ENGINE = self.engine
+      DB_CONNECTION = self.connection
+
+  def __call__(self, sql, engine, is_final):
+    return RunSQL(sql, engine, self.connection, is_final)
 def ShowError(error_text):
   print(color.Format('[ {error}Error{end} ] ' + error_text))
 
@@ -259,7 +276,9 @@ def Logica(line, cell, run_query):
                 color.Warn(predicate + '_sql'))
 
   with bar.output_to(logs_idx):
-    if engine == 'sqlite':
+    if engine == 'snowflake':
+      sql_runner = SnowflakeRunner()
+    elif engine == "sqlite":
       sql_runner = SqliteRunner()
     elif engine == 'psql':
       sql_runner = PostgresRunner()
