@@ -331,7 +331,8 @@ class Snowflake(Dialect):
             'ArrayConcat': 'ARRAY_CAT({0}, {1})',
             'JsonExtractScalar': '{0}:{1}',
             'JsonExtract': '{0}:{1}',
-            'Length': 'ARRAY_SIZE(%s)'
+            'Length': 'ARRAY_SIZE(%s)',
+            'DateDiff': 'DATEDIFF({0}, {1}, {2})'
         }
 
     def InfixOperators(self):
