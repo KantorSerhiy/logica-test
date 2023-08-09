@@ -95,9 +95,12 @@ DaysDiff(start_date:, end_date:) = DateDiff("day", start_date, end_date);
 ParseStrTimestamp(str_timpestamp) = SqlExpr(
   "from_iso8601_timestamp({str_timpestamp})", 
   {str_timpestamp:});
-
-From_Unixtime(string) = SqlExpr(
+  
+From_ISO8601_TIMESTAMP_NANOS(string) = SqlExpr(
   "FROM_ISO8601_TIMESTAMP_NANOS({string})", {string:});
+
+From_Unixtime(int) = SqlExpr(
+  "FROM_UNIXTIME({int})", {int:});
   
 JsonExtractAsString(json, path) = SqlExpr(
   "json_format(json_extract({json}, {path}))", {json:, path:});
