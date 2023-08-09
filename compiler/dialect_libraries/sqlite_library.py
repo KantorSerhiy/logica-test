@@ -49,5 +49,5 @@ WriteFile(filename, content:) = SqlExpr("WriteFile({filename}, {content})",
 Fingerprint(s) = SqlExpr("Fingerprint({s})", {s:});
 
 JsonArrayContains(json_value, value) =
-  SqlExpr("EXISTS (SELECT 1 FROM json_each({json_value}) WHERE json_each.value LIKE {value})", {json_value:, value:});
+  SqlExpr("CASE WHEN {json_value} IS NULL THEN NULL ELSE CASE WHEN EXISTS (SELECT 1 FROM json_each({json_value}) WHERE json_each.value LIKE {value}) THEN TRUE ELSE FALSE END END", {json_value:, value:});
 """
