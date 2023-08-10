@@ -83,6 +83,10 @@ def SetDbConnection(connection):
   global DB_CONNECTION
   DB_CONNECTION = connection
 
+def SetEngine(engine):
+  global DB_ENGINE
+  DB_ENGINE = engine
+
 def EnsureAuthenticatedUser():
   global USER_AUTHENTICATED
   global PROJECT
@@ -159,6 +163,11 @@ def RunSQL(sql, engine, connection=None, is_final=False):
       ShowError("Error while executing SQL:\n%s" % e)
       raise e
     return None
+  elif engine == "snowflake":
+    if is_final:
+      return pandas.read_sql(sql, connection)
+    else:
+      return connection.execute(sql)
   else:
     raise Exception('Logica only supports BigQuery, PostgreSQL and SQLite '
                     'for now.')
@@ -188,6 +197,17 @@ class PostgresRunner(object):
   def  __call__(self, sql, engine, is_final):
     return RunSQL(sql, engine, self.connection, is_final)
 
+class SnowflakeRunner(object):
+  def __init__(self):
+    global DB_CONNECTION
+    global DB_ENGINE
+    if DB_CONNECTION:
+      self.engine = DB_ENGINE
+      self.connection = DB_CONNECTION
+
+
+  def __call__(self, sql, engine, is_final):
+    return RunSQL(sql, engine, self.connection, is_final)
 
 def ShowError(error_text):
   print(color.Format('[ {error}Error{end} ] ' + error_text))
@@ -207,6 +227,8 @@ def Logica(line, cell, run_query):
     return
   try:
     program = universe.LogicaProgram(parsed_rules)
+    global DB_ENGINE
+    engine = program.annotations.Engine() if DB_ENGINE is None else DB_ENGINE
   except functors.FunctorError as e:
     e.ShowMessage()
     return
@@ -214,7 +236,7 @@ def Logica(line, cell, run_query):
     e.ShowMessage()
     return
 
-  engine = program.annotations.Engine()
+  # engine = program.annotations.Engine()
 
   if engine == 'bigquery' and not BQ_READY:
     ShowError(
@@ -259,7 +281,9 @@ def Logica(line, cell, run_query):
                 color.Warn(predicate + '_sql'))
 
   with bar.output_to(logs_idx):
-    if engine == 'sqlite':
+    if engine == 'snowflake':
+      sql_runner = SnowflakeRunner()
+    elif engine == "sqlite":
       sql_runner = SqliteRunner()
     elif engine == 'psql':
       sql_runner = PostgresRunner()

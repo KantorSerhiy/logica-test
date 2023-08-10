@@ -16,7 +16,6 @@
 
 library = """
 ->(left:, right:) = {arg: left, value: right};
-`=`(left:, right:) = right :- left == right;
 
 Arrow(left, right) = arrow :-
   left == arrow.arg,
@@ -40,6 +39,10 @@ ArgMaxK(arr, k) =
 Array(arr) =
     SqlExpr("ArgMin({v}, {a}, null)", {a:, v:}) :- Arrow(a, v) == arr; 
 
+ArraySize(array) = SqlExpr(
+  "json_array_length({array})", 
+  {array:});
+
 ReadFile(filename) = SqlExpr("ReadFile({filename})", {filename:});
 
 ReadJson(filename) = ReadFile(filename);
@@ -47,14 +50,24 @@ ReadJson(filename) = ReadFile(filename);
 WriteFile(filename, content:) = SqlExpr("WriteFile({filename}, {content})",
                                         {filename:, content:});
 
-Fingerprint(s) = SqlExpr("Fingerprint({s})", {s:});
+Fingerprint(s) = SqlExpr("Fingerprint({s})", {s:}); 
 
-Intelligence(command) = SqlExpr("Intelligence({command})", {command:});
+ElementAt(array, index) = SqlExpr(
+  "ELEMENT_AT({array}, {index})", {array:, index:});
 
-AssembleRecord(field_values) = SqlExpr("AssembleRecord({field_values})", {field_values:});
+JsonArrayContains(json_value, value) =
+  SqlExpr("CASE WHEN {json_value} = 'null' OR {json_value} IS NULL THEN NULL ELSE CASE WHEN EXISTS (SELECT 1 FROM json_each({json_value}) WHERE json_each.value LIKE {value}) THEN TRUE ELSE FALSE END END", {json_value:, value:});
 
-DisassembleRecord(record) = SqlExpr("DisassembleRecord({record})", {record:});
+JsonArrayLength(arr) = SqlExpr(
+  "JSON_ARRAY_LENGTH({arr})", {arr:});
 
-Char(code) = SqlExpr("CHAR({code})", {code:});
+ToJsonArray(col) = SqlExpr("{col}", {col:});
 
+ToJson(col) = SqlExpr("{col}", {col:});
+
+JsonParse(col) = SqlExpr(
+  "JSON({col})", 
+  {col:});
+
+GetField(obj, field) =  (SqlExpr("JSON_EXTRACT({obj}, {field})", {obj:, field:}));
 """
