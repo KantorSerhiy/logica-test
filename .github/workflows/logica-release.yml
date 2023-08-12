@@ -1,0 +1,91 @@
+name: Release Workflow
+
+on:
+  workflow_dispatch:
+    inputs:
+      release-version:
+        required: true
+        description: Specify Release version
+      release-desc:
+        required: true
+        description: Specify Release desc
+
+jobs:
+  restructure:
+    permissions: write-all
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Create logica folder, move files, and add __init__.py
+      run: |
+        mkdir logica
+        mv common ./logica
+        mv compiler ./logica
+        mv parser_py ./logica
+        mv colab_logica.py ./logica
+        mv __main__.py ./logica
+        mv logica.py ./logica
+        touch logica/__init__.py
+        touch ./logica/common/__init__.py
+        touch ./logica/common/data/__init__.py
+        touch ./logica/compiler/__init__.py
+        touch ./logica/compiler/dialect_libraries/__init__.py
+        touch ./logica/parser_py/__init__.py
+        rm -rf examples
+        rm -rf docs
+        rm -rf integration_tests
+        rm -rf lib
+        rm -rf syntax
+        rm -rf tools
+        rm -rf tutorial
+        rm -rf type_inference
+        rm -rf CONTRIBUTING.md
+        rm -rf LICENSE
+        rm -rf run_all_tests.py
+        rm -rf .DS_Store
+
+    - name: Archive restructured files
+      run: |
+        zip -r logica.zip .
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: logica-artifact
+        path: logica.zip
+
+  release:
+    needs: restructure
+    runs-on: ubuntu-latest
+    permissions: write-all
+    steps:
+    - name: Download artifacts
+      uses: actions/download-artifact@v3
+      with:
+        name: logica-artifact
+        path: .
+
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.event.inputs.release-version }}
+        release_name: ${{ github.event.inputs.release-version }}
+        body: |
+          ${{ github.event.inputs.release-desc }}
+        draft: false
+        prerelease: false
+
+    - name: Upload Release Asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./logica.zip
+        asset_name: logica.zip
+        asset_content_type: logica/zip
