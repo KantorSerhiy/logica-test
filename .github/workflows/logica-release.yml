@@ -58,7 +58,7 @@ jobs:
 
   release:
     needs: restructure
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-zpc
     permissions: write-all
     steps:
     - name: Download artifacts
