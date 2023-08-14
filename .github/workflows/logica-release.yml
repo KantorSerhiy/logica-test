@@ -45,6 +45,7 @@ jobs:
         rm -rf LICENSE
         rm -rf run_all_tests.py
         rm -rf .DS_Store
+        rm -rf .git
 
     - name: Archive restructured files
       run: |
