@@ -33,7 +33,7 @@ jobs:
           git config user.name "Your Name"
           git config user.email "your-email@example.com"
           branch_name="${{ github.event.inputs.branch-name }}"
-          if git rev-parse --quiet --verify "refs/heads/$branch_name"; then
+          if git rev-parse --quiet --verify $branch_name; then
             echo "Branch $branch_name already exists. Aborting the workflow."
             exit 1
           else
