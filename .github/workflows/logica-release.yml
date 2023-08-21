@@ -28,25 +28,12 @@ jobs:
 #          fi
 
       - name: Check if branch exists
-        id: check-branch
         run: |
-            branch_name="${{ github.event.inputs.branch-name }}"
-            if git rev-parse --verify "$branch_name" >/dev/null 2>&1; then
-            echo "Branch '$branch_name' already exists."
-            echo "::set-output name=branch-exists::true"
-            else
-            echo "Branch '$branch_name' does not exist."
-            echo "::set-output name=branch-exists::false"
-            fi
-
-            - name: Stop if branch exists
-              run: |
-                branch_exists="${{ steps.check-branch.outputs.branch-exists }}"
-                if [[ "$branch_exists" == "true" ]]; then
-                  echo "Action stopped because branch already exists."
-                  exit 1
-                fi
-
+          existing_branch=$(git ls-remote --heads origin ${{ github.event.inputs.branch-name }} | wc -l)
+          if [ $existing_branch -gt 0 ]; then
+            echo "Branch already exists: ${{ github.event.inputs.branch-name }}"
+            exit 1
+          fi
       - name: Create and switch to new branch
         run: |
           git config user.name "Your Name"
