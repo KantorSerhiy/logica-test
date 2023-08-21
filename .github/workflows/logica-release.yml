@@ -22,7 +22,7 @@ jobs:
         run: |
           BRANCH_NAME=${{ github.event.inputs.branch-name }}
           echo $BRANCH_NAME
-          if git show-ref --verify --quiet refs/heads/$BRANCH_NAME; then
+          if git show-ref --verify --quiet $BRANCH_NAME; then
             echo "$BRANCH_NAME exists. Exiting with code 1."
             exit 1
           else
