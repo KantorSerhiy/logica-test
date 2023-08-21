@@ -20,7 +20,7 @@ jobs:
 
       - name: Fail if branch exists
         run: |
-          if git show-ref ${{ github.event.inputs.branch-name }}; then
+          if git rev-parse --verify ${{ github.event.inputs.branch-name }}; then
             echo "${{ github.event.inputs.branch-name }} exists. Exiting with code 1."
             exit 1
           else
