@@ -18,28 +18,21 @@ jobs:
           ref: main
           clean: true
 
-#      - name: Fail if branch exists
-#        run: |
-#          git fetch origin ${{ github.event.inputs.branch-name }}
-#          if [ $? -eq 0 ]; then
-#            echo "Branch already exists: ${{ github.event.inputs.branch-name }}"
-#          exit 1
-#          else
-#            echo "${{ github.event.inputs.branch-name }} does not exist. Continuing."
-#          fi
+      - name: Fail if branch exists
+        run: |
+          BRANCH_NAME=${{ github.event.inputs.branch-name }}
+          if git show-ref --verify --quiet $BRANCH_NAME; then
+            echo "$BRANCH_NAME exists. Exiting with code 1."
+            exit 1
+          else
+            echo "$BRANCH_NAME does not exist. Continuing."
+          fi
 
       - name: Create and switch to new branch
         run: |
           git config user.name "Your Name"
           git config user.email "your-email@example.com"
-          branch_name="${{ github.event.inputs.branch-name }}"
-          if git branch -r | grep -qn origin/$branch_name; then
-            echo "Branch already exists: $branch_name"
-            exit 1
-          else
-            echo "$branch_name does not exist. Continuing."
-            git checkout -b "$branch_name"
-          fi
+          git checkout -b ${{ github.event.inputs.branch-name }}
 
       
 
