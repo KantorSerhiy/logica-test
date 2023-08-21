@@ -20,12 +20,11 @@ jobs:
 
       - name: Fail if branch exists
         run: |
-          BRANCH_NAME=${{ github.event.inputs.branch-name }}
-          if git show-ref --verify --quiet $BRANCH_NAME; then
-            echo "$BRANCH_NAME exists. Exiting with code 1."
+          if git show-ref --verify --quiet ${{ github.event.inputs.branch-name }}; then
+            echo "${{ github.event.inputs.branch-name }} exists. Exiting with code 1."
             exit 1
           else
-            echo "$BRANCH_NAME does not exist. Continuing."
+            echo "${{ github.event.inputs.branch-name }} does not exist. Continuing."
           fi
 
       - name: Create and switch to new branch
