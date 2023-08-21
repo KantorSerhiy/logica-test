@@ -20,12 +20,12 @@ jobs:
 
       - name: Fail if branch exists
         run: |
-          set -e
-          if git rev-parse --verify origin/${{ github.event.inputs.branch-name}} >/dev/null 2>&1; then
-            echo "Branch already exists: ${{ github.event.inputs.branch-name }}"
+          BRANCH_NAME=${{ github.event.inputs.branch-name }}
+          if git show-ref --verify --quiet "refs/heads/$BRANCH_NAME"; then
+            echo "$BRANCH_NAME exists. Exiting with code 1."
             exit 1
           else
-            echo "Branch does not exist: ${{ github.event.inputs.branch-name }}"
+            echo "$BRANCH_NAME does not exist. Continuing."
           fi
 
       - name: Create and switch to new branch
