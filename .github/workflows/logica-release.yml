@@ -17,6 +17,12 @@ jobs:
         with:
           ref: main
 
+      - name: Create and switch to new branch
+        run: |
+          git config user.name "Your Name"
+          git config user.email "your-email@example.com"
+          git checkout -b ${{ github.event.inputs.branch-name }}
+
       - name: Check if branch exists
         run: |
             BRANCH_NAME="${{ github.event.inputs.branch-name }}"
@@ -27,11 +33,6 @@ jobs:
               echo "Branch $BRANCH_NAME does not exist. Continuing."
             fi
 
-      - name: Create and switch to new branch
-        run: |
-          git config user.name "Your Name"
-          git config user.email "your-email@example.com"
-          git checkout -b ${{ github.event.inputs.branch-name }}
 
       - name: Create 'logica' directory
         run: mkdir -p ./logica
