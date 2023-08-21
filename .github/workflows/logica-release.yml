@@ -20,7 +20,7 @@ jobs:
 
       - name: Fail if branch exists
         run: |
-          exists=`git show-ref refs/heads/<branch-name>`
+          exists=`git show-ref refs/heads/${{ github.event.inputs.branch-name }}`
           echo $exists
 
 #          if git rev-parse --verify ${{ github.event.inputs.branch-name }}; then
