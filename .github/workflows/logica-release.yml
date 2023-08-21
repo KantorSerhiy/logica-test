@@ -33,6 +33,8 @@ jobs:
           if [ $existing_branch -gt 0 ]; then
             echo "Branch already exists: ${{ github.event.inputs.branch-name }}"
             exit 1
+          else
+            echo "${{ github.event.inputs.branch-name }} does not exist. Continuing."
           fi
       - name: Create and switch to new branch
         run: |
