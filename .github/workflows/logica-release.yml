@@ -21,7 +21,7 @@ jobs:
       - name: Fail if branch exists
         run: |
           set -e
-          if git rev-parse --verify ${{ github.event.inputs.branch-name }}; then
+          if git rev-parse --verify origin/${{ github.event.inputs.branch-name}} >/dev/null 2>&1; then
             echo "Branch already exists: ${{ github.event.inputs.branch-name }}"
             exit 1
           else
