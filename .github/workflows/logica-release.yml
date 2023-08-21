@@ -1,92 +1,66 @@
-name: Release Workflow
+name: New Repo sync
 
 on:
   workflow_dispatch:
     inputs:
-      release-version:
+      branch-name:
         required: true
-        description: Specify Release version
-      release-desc:
-        required: true
-        description: Specify Release desc
+        description: Enter newest branch name
 
 jobs:
-  restructure:
-    permissions: write-all
+  sync:
     runs-on: ubuntu-latest
+
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
+      - name: Checkout 'main' branch
+        uses: actions/checkout@v3
+        with:
+          ref: main
 
-    - name: Create logica folder, move files, and add __init__.py
-      run: |
-        mkdir logica
-        mv common ./logica
-        mv compiler ./logica
-        mv parser_py ./logica
-        mv colab_logica.py ./logica
-        mv __main__.py ./logica
-        mv logica.py ./logica
-        touch logica/__init__.py
-        touch ./logica/common/__init__.py
-        touch ./logica/common/data/__init__.py
-        touch ./logica/compiler/__init__.py
-        touch ./logica/compiler/dialect_libraries/__init__.py
-        touch ./logica/parser_py/__init__.py
-        rm -rf examples
-        rm -rf docs
-        rm -rf integration_tests
-        rm -rf lib
-        rm -rf syntax
-        rm -rf tools
-        rm -rf tutorial
-        rm -rf type_inference
-        rm -rf CONTRIBUTING.md
-        rm -rf LICENSE
-        rm -rf run_all_tests.py
-        rm -rf .DS_Store
-        rm -rf .git
 
-    - name: Archive restructured files
-      run: |
-        zip -r logica.zip .
+      - name: Create and switch to new branch
+        run: |
+          git config user.name "Your Name"
+          git config user.email "your-email@example.com"
+          git checkout -b ${{ github.event.inputs.branch-name }}
 
-    - name: Upload artifacts
-      uses: actions/upload-artifact@v3
-      with:
-        name: logica-artifact
-        path: logica.zip
+      - name: Create 'logica' directory
+        run: mkdir -p ./logica
 
-  release:
-    needs: restructure
-    runs-on: ubuntu-latest
-    permissions: write-all
-    steps:
-    - name: Download artifacts
-      uses: actions/download-artifact@v3
-      with:
-        name: logica-artifact
-        path: .
+      - name: Move 'main' contents to 'logica'
+        run: |
+          mv common ./logica
+          mv compiler ./logica
+          mv parser_py ./logica
+          mv colab_logica.py ./logica
+          mv __main__.py ./logica
+          mv logica.py ./logica
+          rm -rf examples
+          rm -rf docs
+          rm -rf integration_tests
+          rm -rf lib
+          rm -rf syntax
+          rm -rf tools
+          rm -rf tutorial
+          rm -rf type_inference
+          rm -rf CONTRIBUTING.md
+          rm -rf LICENSE
+          rm -rf run_all_tests.py
+          rm -rf .DS_Store
 
-    - name: Create Release
-      id: create_release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        tag_name: ${{ github.event.inputs.release-version }}
-        release_name: ${{ github.event.inputs.release-version }}
-        body: |
-          ${{ github.event.inputs.release-desc }}
-        draft: false
-        prerelease: false
+      - name: Create __init__.py in logica folder
+        run: |
+          touch ./logica/__init__.py
+          touch ./logica/common/__init__.py
+          touch ./logica/common/data/__init__.py
+          touch ./logica/compiler/__init__.py
+          touch ./logica/compiler/dialect_libraries/__init__.py
+          touch ./logica/parser_py/__init__.py
 
-    - name: Upload Release Asset
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./logica.zip
-        asset_name: logica.zip
-        asset_content_type: logica/zip
+
+      - name: Commit and push changes to new branch
+        run: |
+          git add .
+          git commit -m "Sync changes"
+          git push origin ${{ github.event.inputs.branch-name }}
+
